@@ -20,4 +20,5 @@ In my free time, I:
 - speak passionately about design, accessibility and open source software,
 - contribute to open source projects I care about (there seems to be a lot of them)
 - or attempt to crochet something - anything - to completion. (Current crochet project status: eternally “almost finished.”)
+
 Feel free to [reach out](https://www.linkedin.com/in/victorianduka) if you’d like to connect.
