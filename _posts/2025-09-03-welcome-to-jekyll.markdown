@@ -7,5 +7,3 @@ categories: jekyll update
 It's a work in progress 🚧.
 
 Here you'll find [my works](/works/) and almost everything [about me](/about/).
-
-
