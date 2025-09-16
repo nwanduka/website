@@ -19,6 +19,7 @@ This is a curated list of some of my articles published across various blogs:
 
 ## Talks 🎤
 - [Beyond automation: why manual accessibility testing is important](https://www.youtube.com/watch?v=1vTE2KV7yXw), _WordPress Accessbility Day 2024_
+- [Open but not accessible: redefining inclusion for people with disabilities in open source](https://www.youtube.com/watch?v=RllGKfSqe6k&t=885s), _CHAOSSCon Africa 2025_
 - [UX research report: Prometheus and OTel resource attributes](https://kccncna2025.sched.com/event/27FZr/ux-research-report-prometheus-and-otels-resource-attributes-victoria-nduka-independent-amy-super-grafana-labs), _KubeCon + CloudNativeCon North America 2025_
 - [UX research report: Prometheus and OTel resource attributes](https://promcon.io/2025-munich/talks/ux-research-report-prometheus-and-otels-resource-attributes/), _PromCon Europe 2025_
 - [Inclusive teams make inclusive products](https://inclusivedesign24.org/2025/schedule/), _Inclusive Design #24 2025_
