@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-Fetch external blog posts from Prometheus and freeCodeCamp/Hashnode
-and convert them to Jekyll markdown format.
+Fetch external blog posts from Prometheus and convert them to Jekyll markdown format.
 """
 
 import os
@@ -12,7 +11,8 @@ from pathlib import Path
 
 # Configuration
 GITHUB_USERNAME = "nwanduka"
-POSTS_DIR = "_posts"  # Your Jekyll posts directory
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+POSTS_DIR = PROJECT_ROOT / "_posts"
 
 # GitHub API settings
 GITHUB_API = "https://api.github.com"
