@@ -42,10 +42,12 @@ def fetch_prometheus_posts():
                 
                 # Check if user is author
                 if f"@{GITHUB_USERNAME}" in content or GITHUB_USERNAME in content:
-                    filename = file["name"].replace(".md", "")  # e.g. 2025-10-30-non-code-contribution
-                        year, month, day, *rest = filename.split("-")
-                        post_slug = "-".join(rest)
-                        
+                    # e.g. 2025-10-30-non-code-contribution
+                    filename_raw = file["name"].replace(".md", "") 
+                    # Use rsplit to be safe, but simple split on '-' works for this format
+                    year, month, day, *rest = filename_raw.split("-")
+                    post_slug = "-".join(rest)
+
                     posts.append({
                         "content": content,
                         "filename": file["name"],
@@ -80,58 +82,67 @@ def extract_prometheus_frontmatter(content):
 
 def create_jekyll_post(post_data, platform):
     """Create Jekyll markdown file from post data."""
-    
+
     if platform == "prometheus":
         frontmatter, body = extract_prometheus_frontmatter(post_data['content'])
         if not frontmatter:
             print(f"  Skipping {post_data['filename']} - no frontmatter")
             return
+
+        # ------------------- FINAL FIX APPLIED HERE -------------------
+        # We MUST use the filename for the final date and slug for Jekyll.
+        raw = post_data['filename'].replace('.md', '')
+        # raw example: 2025-10-30-non-code-contribution
+
+        # Use regex to reliably extract the date and the rest of the string (the slug)
+        date_match = re.match(r'^(\d{4}-\d{2}-\d{2})-(.*)$', raw)
+
+        if not date_match:
+            print(f"  Skipping {post_data['filename']} - failed to parse date and slug from filename.")
+            return
+
+        # date_str is '2025-10-30'
+        date_str = date_match.group(1)
+        # slug is 'non-code-contribution'
+        slug = date_match.group(2)
         
-        title = frontmatter.get('title', 'Untitled')
-        date_str = frontmatter.get('created_at', datetime.now().strftime('%Y-%m-%d'))
-        
-        # Convert date format
-        try:
-            date_obj = datetime.strptime(date_str, '%Y-%m-%d')
-        except:
-            date_obj = datetime.now()
-        
-        # Create Jekyll filename
-        slug = post_data['filename'].replace('.md', '')
-        filename = f"{date_obj.strftime('%Y-%m-%d')}-{slug}.md"
-        
-        # Create Jekyll frontmatter
-        jekyll_frontmatter = f"""---
+        # Now safely separate YYYY, MM, DD for use in filename construction
+        year, month, day = date_str.split('-')
+
+        # Force date to match the filename, ignore Prometheus frontmatter date
+        date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+        # --------------------------------------------------------------
+
+    # Correct final filename (no duplicate date, always uses filename date)
+    filename = f"{year}-{month}-{day}-{slug}.md"
+
+    # Jekyll front matter
+    jekyll_frontmatter = f"""---
 layout: post
-title: "{title}"
+title: "{frontmatter.get('title', 'Untitled')}"
 date: {date_obj.strftime('%Y-%m-%d')}
-categories: [blog, external]
+categories: [blog]
 tags: [prometheus, monitoring]
 canonical_url: {post_data['url']}
 published_on: "Prometheus Blog"
-
 ---
-
 > Originally published on [Prometheus Blog]({post_data['url']})
 
 {body}
 """
-    
-    
-    # Write to file
+
+    # Write file
     filepath = Path(POSTS_DIR) / filename
-    
-    # Check if file already exists
+
     if filepath.exists():
         print(f"  Skipping {filename} - already exists")
         return
-    
-    # Create posts directory if it doesn't exist
-    Path(POSTS_DIR).mkdir(exist_ok=True)
-    
+
+    POSTS_DIR.mkdir(exist_ok=True)
+
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(jekyll_frontmatter)
-    
+
     print(f"  Created: {filename}")
 
 
