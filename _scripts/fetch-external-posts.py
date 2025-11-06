@@ -12,7 +12,7 @@ from pathlib import Path
 # Configuration
 GITHUB_USERNAME = "nwanduka"
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-POSTS_DIR = PROJECT_ROOT / "_posts"
+POSTS_DIR = PROJECT_ROOT / "_posts" # Your Jekyll posts directory
 
 # GitHub API settings
 GITHUB_API = "https://api.github.com"
@@ -42,10 +42,8 @@ def fetch_prometheus_posts():
                 
                 # Check if user is author
                 if f"@{GITHUB_USERNAME}" in content or GITHUB_USERNAME in content:
-                    # e.g. 2025-10-30-non-code-contribution
-                    filename_raw = file["name"].replace(".md", "") 
-                    # Use rsplit to be safe, but simple split on '-' works for this format
-                    year, month, day, *rest = filename_raw.split("-")
+                    filename = file["name"].replace(".md", "")  # e.g. 2025-10-30-non-code-contribution
+                    year, month, day, *rest = filename.split("-")
                     post_slug = "-".join(rest)
 
                     posts.append({
@@ -53,11 +51,108 @@ def fetch_prometheus_posts():
                         "filename": file["name"],
                         "url": f"https://prometheus.io/blog/{year}/{month}/{day}/{post_slug}/"
                     })
+
                     print(f"  Found: {file['name']}")
         
         return posts
     except Exception as e:
         print(f"Error fetching Prometheus posts: {e}")
+        return []
+
+
+def fetch_hashnode_posts():
+    """Fetch blog posts from Hashnode/freeCodeCamp authored by user."""
+    print("Fetching Hashnode posts...")
+    
+    # Updated query for current Hashnode API
+    query = """
+    query GetUserArticles($username: String!) {
+        user(username: $username) {
+            publication {
+                posts(page: 0) {
+                    edges {
+                        node {
+                            title
+                            slug
+                            content {
+                                markdown
+                            }
+                            publishedAt
+                            url
+                            brief
+                            coverImage {
+                                url
+                            }
+                            tags {
+                                name
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    """
+    
+    try:
+        response = requests.post(
+            HASHNODE_API,
+            json={
+                "query": query,
+                "variables": {"username": HASHNODE_USERNAME}
+            },
+            headers={"Content-Type": "application/json"}
+        )
+        
+        # Print response for debugging
+        if response.status_code != 200:
+            print(f"  API Response: {response.status_code}")
+            print(f"  Response body: {response.text[:500]}")
+            return []
+        
+        data = response.json()
+        
+        # Check for GraphQL errors
+        if 'errors' in data:
+            print(f"  GraphQL errors: {data['errors']}")
+            return []
+        
+        posts = []
+        user_data = data.get('data', {}).get('user', {})
+        
+        if not user_data:
+            print("  No user data found. Check if username is correct.")
+            return []
+        
+        publication = user_data.get('publication', {})
+        if not publication:
+            print("  No publication found for this user.")
+            return []
+        
+        post_edges = publication.get('posts', {}).get('edges', [])
+        
+        for post_edge in post_edges:
+            post = post_edge['node']
+            posts.append({
+                'title': post['title'],
+                'slug': post['slug'],
+                'content': post['content']['markdown'],
+                'date': post['publishedAt'],
+                'url': post['url'],
+                'brief': post.get('brief', ''),
+                'cover_image': post.get('coverImage', {}).get('url', ''),
+                'tags': [tag['name'] for tag in post.get('tags', [])]
+            })
+            print(f"  Found: {post['title']}")
+        
+        return posts
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching Hashnode posts: {e}")
+        if hasattr(e.response, 'text'):
+            print(f"  Response: {e.response.text[:500]}")
+        return []
+    except Exception as e:
+        print(f"Unexpected error: {e}")
         return []
 
 
@@ -82,73 +177,68 @@ def extract_prometheus_frontmatter(content):
 
 def create_jekyll_post(post_data, platform):
     """Create Jekyll markdown file from post data."""
+    
+    frontmatter, body = extract_prometheus_frontmatter(post_data['content'])
+    if not frontmatter:
+        print(f"  Skipping {post_data['filename']} - no frontmatter")
+        return
+    
+    title = frontmatter.get('title', 'Untitled')
+    date_str = frontmatter.get('created_at', datetime.now().strftime('%Y-%m-%d'))
+    
+    # Convert date format
+    try:
+        date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+    except:
+        date_obj = datetime.now()
+    
+    # Create Jekyll filename
+    # strip date from slug: 2025-10-30-non-code-contribution → non-code-contribution
+    raw_slug = post_data['filename'].replace('.md', '')
+    parts = raw_slug.split('-', 3)
+    if len(parts) == 4:
+        slug = parts[3]  # everything after the date
+    else:
+        slug = raw_slug  # fallback
 
-    if platform == "prometheus":
-        frontmatter, body = extract_prometheus_frontmatter(post_data['content'])
-        if not frontmatter:
-            print(f"  Skipping {post_data['filename']} - no frontmatter")
-            return
-
-        # ------------------- FINAL FIX APPLIED HERE -------------------
-        # We MUST use the filename for the final date and slug for Jekyll.
-        raw = post_data['filename'].replace('.md', '')
-        # raw example: 2025-10-30-non-code-contribution
-
-        # Use regex to reliably extract the date and the rest of the string (the slug)
-        date_match = re.match(r'^(\d{4}-\d{2}-\d{2})-(.*)$', raw)
-
-        if not date_match:
-            print(f"  Skipping {post_data['filename']} - failed to parse date and slug from filename.")
-            return
-
-        # date_str is '2025-10-30'
-        date_str = date_match.group(1)
-        # slug is 'non-code-contribution'
-        slug = date_match.group(2)
-        
-        # Now safely separate YYYY, MM, DD for use in filename construction
-        year, month, day = date_str.split('-')
-
-        # Force date to match the filename, ignore Prometheus frontmatter date
-        date_obj = datetime.strptime(date_str, "%Y-%m-%d")
-        # --------------------------------------------------------------
-
-    # Correct final filename (no duplicate date, always uses filename date)
-    filename = f"{year}-{month}-{day}-{slug}.md"
-
-    # Jekyll front matter
+    filename = f"{date_obj.strftime('%Y-%m-%d')}-{slug}.md"
+    
+    # Create Jekyll frontmatter
     jekyll_frontmatter = f"""---
 layout: post
-title: "{frontmatter.get('title', 'Untitled')}"
+title: "{title}"
 date: {date_obj.strftime('%Y-%m-%d')}
-categories: [blog]
+categories: [blog, external]
 tags: [prometheus, monitoring]
 canonical_url: {post_data['url']}
 published_on: "Prometheus Blog"
 ---
+
 > Originally published on [Prometheus Blog]({post_data['url']})
 
 {body}
 """
-
-    # Write file
+    
+    # Write to file
     filepath = Path(POSTS_DIR) / filename
-
+    
+    # Check if file already exists
     if filepath.exists():
         print(f"  Skipping {filename} - already exists")
         return
-
-    POSTS_DIR.mkdir(exist_ok=True)
-
+    
+    # Create posts directory if it doesn't exist
+    Path(POSTS_DIR).mkdir(exist_ok=True)
+    
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(jekyll_frontmatter)
-
+    
     print(f"  Created: {filename}")
 
 
 def main():
     """Main function to fetch and process all posts."""
-    print("Starting external posts sync...\n")
+    print("Starting Prometheus posts sync...\n")
     
     # Fetch from Prometheus
     prometheus_posts = fetch_prometheus_posts()
@@ -156,7 +246,6 @@ def main():
     
     for post in prometheus_posts:
         create_jekyll_post(post, "prometheus")
-    
     
     print("\nSync complete!")
 

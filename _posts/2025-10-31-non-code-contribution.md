@@ -1,12 +1,13 @@
 ---
 layout: post
 title: "How Non-Developers Can Contribute to Prometheus"
-date: 2025-10-30
-categories: [blog]
+date: 2025-10-31
+categories: [blog, external]
 tags: [prometheus, monitoring]
 canonical_url: https://prometheus.io/blog/2025/10/30/non-code-contribution/
 published_on: "Prometheus Blog"
 ---
+
 > Originally published on [Prometheus Blog](https://prometheus.io/blog/2025/10/30/non-code-contribution/)
 
 
