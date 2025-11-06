@@ -105,7 +105,6 @@ categories: [blog, external]
 tags: [prometheus, monitoring]
 canonical_url: {post_data['url']}
 published_on: "Prometheus Blog"
-external: true
 ---
 
 > Originally published on [Prometheus Blog]({post_data['url']})
