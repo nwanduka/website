@@ -42,10 +42,14 @@ def fetch_prometheus_posts():
                 
                 # Check if user is author
                 if f"@{GITHUB_USERNAME}" in content or GITHUB_USERNAME in content:
+                    filename = file["name"].replace(".md", "")  # e.g. 2025-10-30-non-code-contribution
+                        year, month, day, *rest = filename.split("-")
+                        post_slug = "-".join(rest)
+                        
                     posts.append({
-                        'content': content,
-                        'filename': file['name'],
-                        'url': f"https://prometheus.io/blog/{file['name'].replace('.md', '')}/"
+                        "content": content,
+                        "filename": file["name"],
+                        "url": f"https://prometheus.io/blog/{year}/{month}/{day}/{post_slug}/"
                     })
                     print(f"  Found: {file['name']}")
         
@@ -105,6 +109,7 @@ categories: [blog, external]
 tags: [prometheus, monitoring]
 canonical_url: {post_data['url']}
 published_on: "Prometheus Blog"
+
 ---
 
 > Originally published on [Prometheus Blog]({post_data['url']})
