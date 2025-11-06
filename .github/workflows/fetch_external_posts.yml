@@ -24,7 +24,7 @@ jobs:
           pip install -r requirements.txt || true
 
       - name: Run sync script
-        run: python3 scripts/fetch-external-posts.py
+        run: python3 _scripts/fetch-external-posts.py
 
       - name: Commit and push changes
         run: |
