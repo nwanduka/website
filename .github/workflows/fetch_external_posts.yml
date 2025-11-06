@@ -1,0 +1,35 @@
+name: Weekly External Posts Sync
+
+on:
+  schedule:
+    # Runs every Monday at 8AM UTC — adjust if needed
+    - cron: "0 8 * * 1"
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  sync-posts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt || true
+
+      - name: Run sync script
+        run: python3 scripts/fetch_external_posts.py
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Automated post sync" || echo "No changes to commit"
+          git push
