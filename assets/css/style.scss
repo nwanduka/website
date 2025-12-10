@@ -1,0 +1,19 @@
+---
+---
+
+@import "minima";
+
+/* Accessible links - always show underline */
+.post-content a,
+.page-content a,
+article a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+/* Keep navigation links without underlines if you prefer */
+.site-nav a,
+.site-header a {
+  text-decoration: none;
+}
