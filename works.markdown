@@ -19,7 +19,7 @@ This is a curated list of some of my articles published across various blogs:
 
 ## Talks 🎤
 - [UX research report: Prometheus and OTel resource attributes](https://youtu.be/cSLXIAc020A?si=y-cCXi6lwAl2U2qW), _KubeCon + CloudNativeCon North America 2025_
-- [UX research report: Prometheus and OTel resource attributes](https://promcon.io/2025-munich/talks/ux-research-report-prometheus-and-otels-resource-attributes/), _PromCon Europe 2025_
+- [UX research report: Prometheus and OTel resource attributes](https://youtu.be/p4YioGATN-s?si=GmIWuOLs4pt945s1), _PromCon Europe 2025_
 - [Inclusive teams make inclusive products](https://www.youtube.com/watch?v=FpREBvrE_NY&list=PLn7dsvRdQEfFTeoA8kZcsASPbYi2rf4C0), _Inclusive Design #24 2025_
 - [Open but not accessible: redefining inclusion for people with disabilities in open source](https://www.youtube.com/watch?v=RllGKfSqe6k&t=885s), _CHAOSSCon Africa 2025_
 - [Beyond automation: why manual accessibility testing is important](https://www.youtube.com/watch?v=1vTE2KV7yXw), _WordPress Accessbility Day 2024_
