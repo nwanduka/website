@@ -1,0 +1,91 @@
+<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Title -->
+  <text x="450" y="30" font-size="22" font-weight="bold" text-anchor="middle" fill="#333">What the User Sees vs. What the Logs Capture</text>
+  
+  <!-- Left side - User's perspective -->
+  <rect x="50" y="60" width="350" height="480" fill="#f5f5f5" stroke="#999" stroke-width="2" rx="5"/>
+  <text x="225" y="90" font-size="18" font-weight="bold" text-anchor="middle" fill="#1976d2">User Experience</text>
+  
+  <!-- Phone mockup -->
+  <rect x="120" y="110" width="210" height="400" fill="#fff" stroke="#333" stroke-width="3" rx="15"/>
+  <circle cx="225" cy="495" r="15" fill="none" stroke="#333" stroke-width="2"/>
+  
+  <!-- App screen content -->
+  <text x="225" y="145" font-size="14" font-weight="bold" text-anchor="middle" fill="#333">Banking App</text>
+  
+  <!-- Login -->
+  <rect x="140" y="165" width="170" height="30" fill="#e3f2fd" stroke="#1976d2" stroke-width="1" rx="3"/>
+  <text x="225" y="185" font-size="12" text-anchor="middle" fill="#333">Enter credentials</text>
+  
+  <!-- Arrow -->
+  <text x="225" y="210" font-size="20" text-anchor="middle" fill="#666">↓</text>
+  
+  <!-- Balance -->
+  <rect x="140" y="220" width="170" height="50" fill="#e8f5e9" stroke="#388e3c" stroke-width="1" rx="3"/>
+  <text x="225" y="240" font-size="12" text-anchor="middle" fill="#333">Balance: ₦50,000</text>
+  <text x="225" y="258" font-size="11" text-anchor="middle" fill="#666">✓ Login successful</text>
+  
+  <!-- Arrow -->
+  <text x="225" y="285" font-size="20" text-anchor="middle" fill="#666">↓</text>
+  
+  <!-- Transfer -->
+  <rect x="140" y="295" width="170" height="40" fill="#fff3e0" stroke="#f57c00" stroke-width="1" rx="3"/>
+  <text x="225" y="315" font-size="12" text-anchor="middle" fill="#333">Transfer ₦5,000</text>
+  <text x="225" y="330" font-size="11" text-anchor="middle" fill="#666">Enter PIN</text>
+  
+  <!-- Arrow -->
+  <text x="225" y="355" font-size="20" text-anchor="middle" fill="#666">↓</text>
+  
+  <!-- Success -->
+  <rect x="140" y="365" width="170" height="40" fill="#e8f5e9" stroke="#388e3c" stroke-width="1" rx="3"/>
+  <text x="225" y="385" font-size="12" font-weight="bold" text-anchor="middle" fill="#388e3c">Transfer Successful!</text>
+  <text x="225" y="400" font-size="11" text-anchor="middle" fill="#666">New balance: ₦45,000</text>
+  
+  <text x="225" y="430" font-size="13" text-anchor="middle" fill="#666" font-style="italic">Looks simple and seamless</text>
+  
+  <!-- Right side - Behind the scenes logs -->
+  <rect x="500" y="60" width="350" height="480" fill="#1a1a1a" stroke="#666" stroke-width="2" rx="5"/>
+  <text x="675" y="90" font-size="18" font-weight="bold" text-anchor="middle" fill="#4fc3f7">Behind the Scenes: Logs</text>
+  
+  <!-- Log entries -->
+  <text x="520" y="125" font-size="11" font-family="monospace" fill="#4caf50">2024-12-25 09:15:01 INFO</text>
+  <text x="520" y="140" font-size="11" font-family="monospace" fill="#e0e0e0">User opened app, session_id=abc123</text>
+  
+  <text x="520" y="165" font-size="11" font-family="monospace" fill="#4caf50">2024-12-25 09:15:03 INFO</text>
+  <text x="520" y="180" font-size="11" font-family="monospace" fill="#e0e0e0">Login attempt, username=john_doe</text>
+  
+  <text x="520" y="205" font-size="11" font-family="monospace" fill="#4caf50">2024-12-25 09:15:04 DEBUG</text>
+  <text x="520" y="220" font-size="11" font-family="monospace" fill="#e0e0e0">Sending credentials to auth server</text>
+  
+  <text x="520" y="245" font-size="11" font-family="monospace" fill="#4caf50">2024-12-25 09:15:05 INFO</text>
+  <text x="520" y="260" font-size="11" font-family="monospace" fill="#e0e0e0">Auth successful, user_id=7891</text>
+  
+  <text x="520" y="285" font-size="11" font-family="monospace" fill="#4caf50">2024-12-25 09:15:06 INFO</text>
+  <text x="520" y="300" font-size="11" font-family="monospace" fill="#e0e0e0">Fetching account balance</text>
+  
+  <text x="520" y="325" font-size="11" font-family="monospace" fill="#4caf50">2024-12-25 09:15:07 INFO</text>
+  <text x="520" y="340" font-size="11" font-family="monospace" fill="#e0e0e0">Balance retrieved: ₦50,000</text>
+  
+  <text x="520" y="365" font-size="11" font-family="monospace" fill="#4caf50">2024-12-25 09:16:12 INFO</text>
+  <text x="520" y="380" font-size="11" font-family="monospace" fill="#e0e0e0">Transfer initiated, amount=5000</text>
+  
+  <text x="520" y="405" font-size="11" font-family="monospace" fill="#4caf50">2024-12-25 09:16:14 INFO</text>
+  <text x="520" y="420" font-size="11" font-family="monospace" fill="#e0e0e0">PIN verified successfully</text>
+  
+  <text x="520" y="445" font-size="11" font-family="monospace" fill="#4caf50">2024-12-25 09:16:15 INFO</text>
+  <text x="520" y="460" font-size="11" font-family="monospace" fill="#e0e0e0">Transaction completed, txn_id=98765</text>
+  
+  <text x="520" y="485" font-size="11" font-family="monospace" fill="#4caf50">2024-12-25 09:16:16 INFO</text>
+  <text x="520" y="500" font-size="11" font-family="monospace" fill="#e0e0e0">Updated balance: ₦45,000</text>
+  
+  <text x="675" y="530" font-size="13" text-anchor="middle" fill="#bbb" font-style="italic">Every action leaves a detailed trail</text>
+  
+  <!-- Connecting line -->
+  <line x1="400" y1="300" x2="500" y2="300" stroke="#ff9800" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="450" y="290" font-size="12" text-anchor="middle" fill="#ff9800" font-weight="bold">Same actions</text>
+  
+  <!-- Bottom note -->
+  <text x="450" y="580" font-size="14" text-anchor="middle" fill="#666">
+    When something goes wrong, support uses these logs to understand exactly what happened
+  </text>
+</svg>
