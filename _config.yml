@@ -31,7 +31,7 @@ google_analytics: G-H34HZ9Y9S9
 # Build settings
 theme: minima
 plugins:
-  - jekyll-feeds
+  - jekyll-feed
 
 # Exclude from processing.
 # The following items will not be processed, by default.

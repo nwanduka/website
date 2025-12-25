@@ -17,7 +17,7 @@ Logs are records of events that happen in a system over time. When you log into 
 Every action you take (checking your balance, making a transfer) involves similar chains of events.
 The system tracks all these activities by recording each event as it happens. These records are called logs.
 
-![Logs tracking user actions in a banking app](../assets/images/banking_app_logs_diagram.svg)
+![Logs tracking user actions in a banking app](/assets/images/banking_app_logs_diagram.svg)
 
 ### The anatomy of a log
 A good log entry usually contains three key elements:
@@ -26,9 +26,10 @@ A good log entry usually contains three key elements:
 - Severity Level: How important is this?
 
 A typical log entry might look like:
-2024-12-24 14:32:15 INFO User john_doe logged in successfully
-2024-12-24 14:32:47 ERROR Database connection failed: timeout after 30s
-2024-12-24 14:33:01 WARNING Disk space below 10% on /dev/sda1
+
+    2024-12-24 14:32:15 INFO User john_doe logged in successfully
+    2024-12-24 14:32:47 ERROR Database connection failed: timeout after 30s
+    2024-12-24 14:33:01 WARNING Disk space below 10% on /dev/sda1
 
 ## The ‘severity levels’ of logs
 Not all events are equally important. Some things are just routine operations, while others are urgent problems. This is where log levels come in.
@@ -39,7 +40,7 @@ Not all events are equally important. Some things are just routine operations, w
 - `ERROR` means something actually failed. "Couldn't save to database." "Payment service is down." A specific operation didn't work, though the overall system might still be running.
 - `CRITICAL` (or `FATAL`) is the "everything's on fire" level. "Out of memory, shutting down." "Cannot connect to database at all." The system can't continue operating.
 
-![Diagram to illustrate log levels](../assets/images/log_levels_diagram.svg)
+![Diagram to illustrate log levels](/assets/images/log_levels_diagram.svg)
 
 ### How log levels work
 When you set your logging level, you're setting a threshold. The logger (the part of a program or system responsible for creating logs) will capture that level and everything above it.
@@ -102,7 +103,7 @@ In many systems, audit logs are immutable (append-only and cannot be altered aft
 ### 6. Error logs
 Error logs specifically capture failures and exceptions. While errors often appear inside application logs, some systems separate them into dedicated error logs to make problems easier to spot and investigate.
 
-![Types of logs](../assets/images/types_of_logs.jpeg)
+![Types of logs](/assets/images/types_of_logs.jpeg)
 
 In practice, these different log types might all flow into the same centralized logging system, but keeping them conceptually separate helps engineers know where to look when investigating specific issues.
 
