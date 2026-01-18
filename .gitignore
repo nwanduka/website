@@ -3,3 +3,6 @@ _site
 .jekyll-cache
 .jekyll-metadata
 vendor
+a11y-monitoring/
+a11y-monitoring-v2/
+node_modules/
