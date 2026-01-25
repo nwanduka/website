@@ -2,7 +2,7 @@
 // Tracks real user accessibility interactions and sends to Loki
 
 (function() {
-  const LOKI_URL = 'http://localhost:3100/loki/api/v1/push';
+  const LOKI_URL = 'http://localhost:3101/loki/api/v1/push';
   
   const tracker = {
     sessionId: generateSessionId(),
