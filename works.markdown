@@ -4,6 +4,10 @@ title: Works
 permalink: /works/
 ---
 
+## YouTube Videos 📹
+I'm building an observability learning library in video form. Please subscribe:
+- [What is observability?](https://youtu.be/elw5smwI-SI?si=pOHIJ0RjJYq4PmBS)
+
 ## Articles 📝
 This is a curated list of some of my articles published across various blogs:
 - [freeCodeCamp](https://www.freecodecamp.org/news/author/nwanduka/)
