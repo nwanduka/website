@@ -4,7 +4,7 @@ title: "The Journey of a Log: Understanding the Log Lifecycle"
 date: 2026-01-26
 tags: [logs, observability, monitoring]
 ---
-You likely know logs as records of application events, but that’s only half the story. You may know [what logs are](2025-12-25-what-logs-are.md). But how are they generated? Where are they stored, and for how long? When you need to troubleshoot an error, how do you search through millions of log entries to find what you need?
+You likely know logs as records of application events, but that’s only half the story. You may know [what logs are](https://victorianduka.com/2025/12/25/what-logs-are.html). But how are they generated? Where are they stored, and for how long? When you need to troubleshoot an error, how do you search through millions of log entries to find what you need?
 
 These are important questions you may have if you're new to observability. They are foundational concepts you need to understand if you intend to build scalable log management systems in the future.
 
