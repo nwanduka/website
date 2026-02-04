@@ -1,0 +1,18 @@
+{
+	"ulid": "01KG2HYFCF4962D41EGN2BFK72",
+	"minTime": 1769601629606,
+	"maxTime": 1769608800000,
+	"stats": {
+		"numSamples": 28800,
+		"numFloatSamples": 28800,
+		"numSeries": 120,
+		"numChunks": 245
+	},
+	"compaction": {
+		"level": 1,
+		"sources": [
+			"01KG2HYFCF4962D41EGN2BFK72"
+		]
+	},
+	"version": 1
+}
