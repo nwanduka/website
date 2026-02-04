@@ -1,0 +1,21 @@
+{
+  "name": "a11y-monitoring-v2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@axe-core/puppeteer": "^4.11.0",
+    "axe-core": "^4.11.1",
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
+    "prom-client": "^15.1.3",
+    "puppeteer": "^24.35.0"
+  }
+}

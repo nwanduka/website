@@ -4,5 +4,5 @@ _site
 .jekyll-metadata
 vendor
 a11y-monitoring/
-a11y-monitoring-v2/
+a11y-monitoring-v2/node_modules/
 node_modules/
