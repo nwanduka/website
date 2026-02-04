@@ -3,6 +3,7 @@
 
 const puppeteer = require('puppeteer');
 const { AxePuppeteer } = require('@axe-core/puppeteer');
+const client = require('prom-client');
 
 // Grafana Cloud credentials from environment variables
 const PROMETHEUS_URL = process.env.PROMETHEUS_URL;
@@ -86,37 +87,49 @@ function formatMetricsForPrometheus(url, results, timestamp) {
   return metrics;
 }
 
-// Push metrics to Grafana Cloud Prometheus
+// Push metrics to Grafana Cloud Prometheus using prom-client
 async function pushToPrometheus(allMetrics) {
   if (!PROMETHEUS_URL || !PROMETHEUS_USER || !PROMETHEUS_PASSWORD) {
     throw new Error('Missing Grafana Cloud credentials in environment variables');
   }
   
-  // Convert metrics to Prometheus remote write format
-  const timeseries = [];
+  // Create a registry and metrics
+  const register = new client.Registry();
   
-  allMetrics.forEach(metric => {
-    const labels = [
-      { name: '__name__', value: metric.name }
-    ];
-    
-    // Add metric labels
-    Object.keys(metric.labels).forEach(key => {
-      labels.push({ name: key, value: metric.labels[key] });
-    });
-    
-    timeseries.push({
-      labels: labels,
-      samples: [{
-        value: metric.value,
-        timestamp: metric.timestamp
-      }]
-    });
+  const violationsGauge = new client.Gauge({
+    name: 'accessibility_violations_total',
+    help: 'Total number of accessibility violations',
+    labelNames: ['url', 'severity'],
+    registers: [register]
   });
   
-  const payload = {
-    timeseries: timeseries
-  };
+  const passesGauge = new client.Gauge({
+    name: 'accessibility_passes_total',
+    help: 'Total number of accessibility checks passed',
+    labelNames: ['url'],
+    registers: [register]
+  });
+  
+  const incompleteGauge = new client.Gauge({
+    name: 'accessibility_incomplete_total',
+    help: 'Total number of incomplete accessibility checks',
+    labelNames: ['url'],
+    registers: [register]
+  });
+  
+  // Set metric values
+  allMetrics.forEach(metric => {
+    if (metric.name === 'accessibility_violations_total') {
+      violationsGauge.labels(metric.labels.url, metric.labels.severity).set(metric.value);
+    } else if (metric.name === 'accessibility_passes_total') {
+      passesGauge.labels(metric.labels.url).set(metric.value);
+    } else if (metric.name === 'accessibility_incomplete_total') {
+      incompleteGauge.labels(metric.labels.url).set(metric.value);
+    }
+  });
+  
+  // Get metrics in Prometheus exposition format
+  const metricsText = await register.metrics();
   
   // Create basic auth header
   const auth = Buffer.from(`${PROMETHEUS_USER}:${PROMETHEUS_PASSWORD}`).toString('base64');
@@ -125,14 +138,13 @@ async function pushToPrometheus(allMetrics) {
     const response = await fetch(PROMETHEUS_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-protobuf',
-        'Authorization': `Basic ${auth}`,
-        'X-Prometheus-Remote-Write-Version': '0.1.0'
+        'Content-Type': 'text/plain',
+        'Authorization': `Basic ${auth}`
       },
-      body: JSON.stringify(payload)
+      body: metricsText
     });
     
-    if (response.ok) {
+    if (response.ok || response.status === 204) {
       console.log('✓ Successfully pushed metrics to Grafana Cloud Prometheus');
     } else {
       const error = await response.text();
