@@ -2,7 +2,7 @@
 // Tracks real user accessibility interactions and sends to Loki
 
 (function() {
-  const LOKI_URL = 'http://localhost:3101/loki/api/v1/push';
+  const LOKI_URL = process.env.ALLOY_LOKI_URL || 'https://website-alloy.onrender.com/loki/api/v1/push';
   
   const tracker = {
     sessionId: generateSessionId(),
