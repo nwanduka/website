@@ -1,0 +1,5 @@
+scrape_configs:
+  - job_name: 'alloy'
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['your-alloy-url.onrender.com:10000']
