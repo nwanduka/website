@@ -1,19 +1,39 @@
 // convert-axe-to-metrics.js
+// Converts axe JSON report into events for Alloy server
+
 const fs = require('fs');
+const path = require('path');
 
-const raw = JSON.parse(fs.readFileSync('axe-output/axe-report.json', 'utf-8'));
-const metrics = [];
+// Path to axe JSON report
+const reportPath = path.join(__dirname, 'axe-output', 'axe-report.json');
+if (!fs.existsSync(reportPath)) {
+  console.error('Axe report not found at', reportPath);
+  process.exit(1);
+}
 
-// Count violations per page
-raw.violations.forEach(v => {
-  const page = v.nodes[0]?.target[0] || 'unknown';
-  metrics.push({
-    eventType: 'violation',
-    page,
-    count: v.nodes.length // each node = one violation instance
+const raw = fs.readFileSync(reportPath, 'utf-8');
+const report = JSON.parse(raw);
+
+// Array to store metric events
+const events = [];
+
+// Convert each violation into a Prometheus-friendly event
+report.violations.forEach(v => {
+  events.push({
+    eventType: 'axe_violation',
+    rule: v.id,
+    impact: v.impact,
+    nodes: v.nodes.length,
+    url: v.url || '/',
+    timestamp: new Date().toISOString()
   });
 });
 
-// Write metrics to file for sending
-fs.writeFileSync('axe-output/metrics.json', JSON.stringify(metrics, null, 2));
-console.log('Converted axe-core report to Alloy metrics format');
+// Optional: Save converted events to JSON for debugging / audit
+const outputDir = path.join(__dirname, 'axe-output');
+if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
+
+const metricsPath = path.join(outputDir, 'axe-metrics.json');
+fs.writeFileSync(metricsPath, JSON.stringify(events, null, 2));
+
+console.log(`[convert-axe-to-metrics] Converted ${events.length} violations to metrics at ${metricsPath}`);
