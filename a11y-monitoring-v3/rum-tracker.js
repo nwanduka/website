@@ -2,7 +2,7 @@
 // Browser RUM script: captures accessibility events and sends to Alloy
 
 (function() {
-  const ALLOY_URL = 'https://your-alloy-url.onrender.com/rum'; // Update with your Alloy Render URL
+  const ALLOY_URL = 'https://website-alloy.onrender.com/rum'; // Update with your Alloy Render URL
 
   const tracker = {
     sessionId: generateSessionId(),
@@ -95,9 +95,12 @@
 
     sendBufferPeriodically() {
       setInterval(() => this.sendToAlloy(), 10000);
-      window.addEventListener('beforeunload', () => this.sendToAlloy());
-    },
-  };
+      window.addEventListener('beforeunload', () => {
+        if (this.eventBuffer.length) {
+            const payload = JSON.stringify({ sessionId: this.sessionId, events: this.eventBuffer });
+            navigator.sendBeacon(ALLOY_URL, payload);
+        }
+  });
 
   function generateSessionId() {
     return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2,9);
