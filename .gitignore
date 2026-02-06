@@ -5,4 +5,5 @@ _site
 .env
 vendor
 a11y-monitoring/
+a11y-monitoring-v3/
 node_modules/
