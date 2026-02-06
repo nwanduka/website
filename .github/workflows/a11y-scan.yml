@@ -26,7 +26,5 @@ jobs:
       - name: Run accessibility scan
         working-directory: ./a11y-monitoring-v2
         env:
-          PROMETHEUS_URL: ${{ secrets.PROMETHEUS_URL }}
-          PROMETHEUS_USER: ${{ secrets.PROMETHEUS_USER }}
-          PROMETHEUS_PASSWORD: ${{ secrets.PROMETHEUS_PASSWORD }}
+          ALLOY_URL: ${{ secrets.ALLOY_URL }}
         run: node grafana-cloud-exporter.js
