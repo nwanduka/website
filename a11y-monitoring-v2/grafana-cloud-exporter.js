@@ -5,7 +5,7 @@ const puppeteer = require('puppeteer');
 const { AxePuppeteer } = require('@axe-core/puppeteer');
 
 // Grafana Cloud credentials from environment variables
-const ALLOY_URL = process.env.ALLOY_URL || 'http://localhost:9091/metrics';
+const ALLOY_URL = process.env.ALLOY_URL || 'http://localhost:9091';
 
 // URLs to scan
 const URLS = [
