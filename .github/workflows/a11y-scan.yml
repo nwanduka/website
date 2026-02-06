@@ -1,36 +1,51 @@
-name: Daily Accessibility Scan (axe-core)
+name: Accessibility Scan & Metrics
 
 on:
   schedule:
-    - cron: '0 0 * * *' # runs daily at midnight UTC
-  workflow_dispatch:
+    - cron: '0 0 * * *' # Runs daily at midnight UTC
+  push:
+    branches:
+      - main
 
 jobs:
-  axe:
+  accessibility:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repo
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2️⃣ Set up Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
 
+      # 3️⃣ Install dependencies in a11y-monitoring-v3
       - name: Install dependencies
         working-directory: a11y-monitoring-v3
         run: npm ci
 
-      - name: Run axe-core scan
+      # 4️⃣ Run axe-core scan
+      - name: Run axe scan
+        working-directory: a11y-monitoring-v3
         run: |
           mkdir -p axe-output
-          npx axe --save ./a11y-monitoring-v3 --format json > axe-output/axe-report.json
+          npx axe --save ./ --format json > axe-output/axe-report.json
 
-      - name: Convert axe JSON to Alloy metrics
-        run: node .github/workflows/convert-axe-to-metrics.js
+      # 5️⃣ Convert axe results to Alloy-friendly metrics
+      - name: Convert axe to metrics
+        working-directory: a11y-monitoring-v3
+        run: node convert-axe-to-metrics.js
 
-      - name: Send metrics to Alloy
+      # 6️⃣ Send metrics to Alloy server
+      - name: Send axe metrics to Alloy
+        working-directory: a11y-monitoring-v3
+        run: node send-axe-metrics.js
         env:
           ALLOY_URL: ${{ secrets.ALLOY_URL }}
-        run: node .github/workflows/send-axe-metrics.js
+
+      # 7️⃣ Optional: Print Alloy metrics URL for debugging
+      - name: Check metrics endpoint
+        run: curl -s ${{ secrets.ALLOY_URL.replace('/rum','/metrics') }} | head -n 10
