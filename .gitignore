@@ -2,7 +2,7 @@ _site
 .sass-cache
 .jekyll-cache
 .jekyll-metadata
+.env
 vendor
 a11y-monitoring/
-a11y-monitoring-v2/
 node_modules/
