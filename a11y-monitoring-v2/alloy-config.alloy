@@ -2,7 +2,7 @@
 prometheus.receive_http "github_actions" {
   http {
     listen_address = "0.0.0.0"
-    listen_port = 9091
+    listen_port = env("PORT")
   }
   forward_to = [prometheus.remote_write.grafana_cloud.receiver]
 }
