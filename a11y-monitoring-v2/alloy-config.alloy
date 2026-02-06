@@ -1,0 +1,39 @@
+// Accept Prometheus metrics from GitHub Actions
+prometheus.receive_http "github_actions" {
+  http {
+    listen_address = "0.0.0.0"
+    listen_port = 9091
+  }
+  forward_to = [prometheus.remote_write.grafana_cloud.receiver]
+}
+
+// Send metrics to Grafana Cloud
+prometheus.remote_write "grafana_cloud" {
+  endpoint {
+    url = env("PROMETHEUS_URL")
+    basic_auth {
+      username = env("PROMETHEUS_USER")
+      password = env("PROMETHEUS_PASSWORD")
+    }
+  }
+}
+
+// Loki logs - receive from your website
+loki.source.api "accessibility_logs" {
+  http {
+    listen_address = "0.0.0.0"
+    listen_port = 3101
+  }
+  forward_to = [loki.write.grafana_cloud.receiver]
+}
+
+// Send logs to Grafana Cloud
+loki.write "grafana_cloud" {
+  endpoint {
+    url = env("LOKI_URL")
+    basic_auth {
+      username = env("LOKI_USER")
+      password = env("LOKI_PASSWORD")
+    }
+  }
+}
