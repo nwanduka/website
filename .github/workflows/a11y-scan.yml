@@ -1,25 +1,36 @@
-name: Accessibility Scan
+name: Axe Accessibility Scan
 
 on:
+  push:
+    branches:
+      - main
+      - a11y-monitoring-v3
   schedule:
-    - cron: '0 0 * * *' # daily at midnight
-  workflow_dispatch: # manual trigger
+    - cron: '0 0 * * *'  # Daily at midnight UTC
 
 jobs:
-  scan:
+  axe-scan:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
 
-      - name: Use Node.js
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 20
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
-      - name: Run accessibility scan and push metrics
-        run: node a11y-monitoring-v3/scan-and-push.js
+      - name: Create axe output folder
+        run: mkdir -p axe-output
+
+      - name: Run axe-core scan
+        run: npx @axe-core/cli ./a11y-monitoring-v3 --save axe-output/axe-report.json
+
+      - name: Push metrics to Alloy
+        run: node ./a11y-monitoring-v3/grafana-cloud-push.js
         env:
-          ALLOY_URL: ${{ secrets.ALLOY_URL }}
+          ALLOY_URL: ${{ secrets.ALLOY_URL }}       # your Alloy server URL
