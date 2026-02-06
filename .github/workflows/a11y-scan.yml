@@ -19,6 +19,7 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
+        working-directory: a11y-monitoring-v3
         run: npm ci
 
       - name: Run axe-core scan
