@@ -75,6 +75,7 @@ async function pushToGraphite(metricsText) {
   
   console.log(`Pushing to Graphite at ${GRAPHITE_URL}...`);
   
+  // Graphite uses Basic auth with user:apikey format
   const auth = Buffer.from(`${GRAPHITE_USER}:${GRAPHITE_PASSWORD}`).toString('base64');
   
   try {
@@ -82,7 +83,7 @@ async function pushToGraphite(metricsText) {
       method: 'POST',
       headers: {
         'Content-Type': 'text/plain',
-        'Authorization': `Bearer ${GRAPHITE_PASSWORD}` // Graphite uses Bearer token
+        'Authorization': `Basic ${auth}`
       },
       body: metricsText
     });
