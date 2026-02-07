@@ -56,6 +56,7 @@ function formatForGraphite(allResults) {
       metrics.push({
         name: `accessibility.violations.${sanitizedUrl}.${severity}`,
         value: bySeverity[severity],
+        interval: 60,
         time: timestamp
       });
     });
@@ -63,18 +64,21 @@ function formatForGraphite(allResults) {
     metrics.push({
       name: `accessibility.passes.${sanitizedUrl}`,
       value: results.passes.length,
+      interval: 60,
       time: timestamp
     });
     
     metrics.push({
       name: `accessibility.incomplete.${sanitizedUrl}`,
       value: results.incomplete.length,
+      interval: 60,
       time: timestamp
     });
     
     metrics.push({
       name: `accessibility.total_violations.${sanitizedUrl}`,
       value: results.violations.length,
+      interval: 60,
       time: timestamp
     });
   });
