@@ -25,7 +25,7 @@ jobs:
       - name: Run accessibility scan
         working-directory: ./a11y-monitoring-v4
         env:
-          PROMETHEUS_URL: ${{ secrets.PROMETHEUS_URL }}
-          PROMETHEUS_USER: ${{ secrets.PROMETHEUS_USER }}
-          PROMETHEUS_PASSWORD: ${{ secrets.PROMETHEUS_PASSWORD }}
+          GRAPHITE_URL: ${{ secrets.GRAPHITE_URL }}
+          GRAPHITE_USER: ${{ secrets.GRAPHITE_USER }}
+          GRAPHITE_PASSWORD: ${{ secrets.GRAPHITE_PASSWORD }}
         run: node scan-and-push.js

@@ -1,14 +1,13 @@
 // scan-and-push.js
-// Scans website with axe-core and pushes metrics to Grafana Cloud Prometheus
+// Scans website with axe-core and pushes metrics to Grafana Cloud Graphite
 
 const puppeteer = require('puppeteer');
 const { AxePuppeteer } = require('@axe-core/puppeteer');
-const client = require('prom-client');
 
-// Grafana Cloud Prometheus credentials
-const PROMETHEUS_URL = process.env.PROMETHEUS_URL;
-const PROMETHEUS_USER = process.env.PROMETHEUS_USER;
-const PROMETHEUS_PASSWORD = process.env.PROMETHEUS_PASSWORD;
+// Grafana Cloud Graphite credentials
+const GRAPHITE_URL = process.env.GRAPHITE_URL;
+const GRAPHITE_USER = process.env.GRAPHITE_USER;
+const GRAPHITE_PASSWORD = process.env.GRAPHITE_PASSWORD;
 
 const URLS = [
   'https://victorianduka.com/',
@@ -35,38 +34,16 @@ async function scanWebsite(url) {
   }
 }
 
-// Push metrics directly to Grafana Cloud using text format
-async function pushToGrafanaCloud(allResults) {
-  if (!PROMETHEUS_URL || !PROMETHEUS_USER || !PROMETHEUS_PASSWORD) {
-    throw new Error('Missing Grafana Cloud credentials');
-  }
+// Format metrics for Graphite (simple text format)
+function formatForGraphite(allResults) {
+  const metrics = [];
+  const timestamp = Math.floor(Date.now() / 1000); // Unix timestamp in seconds
   
-  // Create registry and metrics
-  const register = new client.Registry();
-  
-  const violationsGauge = new client.Gauge({
-    name: 'accessibility_violations_total',
-    help: 'Total accessibility violations',
-    labelNames: ['url', 'severity'],
-    registers: [register]
-  });
-  
-  const passesGauge = new client.Gauge({
-    name: 'accessibility_passes_total',
-    help: 'Total accessibility passes',
-    labelNames: ['url'],
-    registers: [register]
-  });
-  
-  const incompleteGauge = new client.Gauge({
-    name: 'accessibility_incomplete_total',
-    help: 'Total incomplete checks',
-    labelNames: ['url'],
-    registers: [register]
-  });
-  
-  // Set metric values
   allResults.forEach(({ url, results }) => {
+    // Sanitize URL for metric name (replace special chars with underscores)
+    const sanitizedUrl = url.replace(/[^a-zA-Z0-9]/g, '_');
+    
+    // Count violations by severity
     const bySeverity = { critical: 0, serious: 0, moderate: 0, minor: 0 };
     
     results.violations.forEach(violation => {
@@ -74,37 +51,45 @@ async function pushToGrafanaCloud(allResults) {
       bySeverity[severity] = (bySeverity[severity] || 0) + violation.nodes.length;
     });
     
+    // Create Graphite metrics: metric.path value timestamp
     Object.keys(bySeverity).forEach(severity => {
-      violationsGauge.labels(url, severity).set(bySeverity[severity]);
+      metrics.push(`accessibility.violations.${sanitizedUrl}.${severity} ${bySeverity[severity]} ${timestamp}`);
     });
     
-    passesGauge.labels(url).set(results.passes.length);
-    incompleteGauge.labels(url).set(results.incomplete.length);
+    metrics.push(`accessibility.passes.${sanitizedUrl} ${results.passes.length} ${timestamp}`);
+    metrics.push(`accessibility.incomplete.${sanitizedUrl} ${results.incomplete.length} ${timestamp}`);
+    
+    // Total violations
+    const totalViolations = results.violations.length;
+    metrics.push(`accessibility.total_violations.${sanitizedUrl} ${totalViolations} ${timestamp}`);
   });
   
-  // Get metrics in Prometheus text format
-  const metrics = await register.metrics();
+  return metrics.join('\n');
+}
+
+// Push to Graphite
+async function pushToGraphite(metricsText) {
+  if (!GRAPHITE_URL || !GRAPHITE_USER || !GRAPHITE_PASSWORD) {
+    throw new Error('Missing Graphite credentials');
+  }
   
-  // Try to push to Grafana Cloud's write endpoint
-  // Use /api/v1/write which accepts text format (not remote write)
-  const writeUrl = PROMETHEUS_URL.replace('/api/prom/push', '/api/v1/write');
+  console.log(`Pushing to Graphite at ${GRAPHITE_URL}...`);
   
-  console.log(`Pushing to Grafana Cloud...`);
-  
-  const auth = Buffer.from(`${PROMETHEUS_USER}:${PROMETHEUS_PASSWORD}`).toString('base64');
+  const auth = Buffer.from(`${GRAPHITE_USER}:${GRAPHITE_PASSWORD}`).toString('base64');
   
   try {
-    const response = await fetch(writeUrl, {
+    const response = await fetch(GRAPHITE_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'text/plain',
-        'Authorization': `Basic ${auth}`
+        'Authorization': `Bearer ${GRAPHITE_PASSWORD}` // Graphite uses Bearer token
       },
-      body: metrics
+      body: metricsText
     });
     
-    if (response.ok || response.status === 204) {
-      console.log('✓ Successfully pushed metrics to Grafana Cloud');
+    if (response.ok || response.status === 204 || response.status === 200) {
+      console.log('✓ Successfully pushed metrics to Graphite');
+      return true;
     } else {
       const error = await response.text();
       console.error('✗ Failed:', response.status, error);
@@ -133,7 +118,12 @@ async function main() {
   }
   
   if (allResults.length > 0) {
-    await pushToGrafanaCloud(allResults);
+    const metricsText = formatForGraphite(allResults);
+    console.log('\nMetrics to send:');
+    console.log(metricsText);
+    console.log('');
+    
+    await pushToGraphite(metricsText);
   }
   
   console.log('Scan complete!');
