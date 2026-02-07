@@ -34,7 +34,7 @@ async function scanWebsite(url) {
   }
 }
 
-// Format metrics for Graphite (simple text format)
+// Format metrics for Graphite (JSON format)
 function formatForGraphite(allResults) {
   const metrics = [];
   const timestamp = Math.floor(Date.now() / 1000); // Unix timestamp in seconds
@@ -51,24 +51,39 @@ function formatForGraphite(allResults) {
       bySeverity[severity] = (bySeverity[severity] || 0) + violation.nodes.length;
     });
     
-    // Create Graphite metrics: metric.path value timestamp
+    // Create Graphite metrics in JSON format
     Object.keys(bySeverity).forEach(severity => {
-      metrics.push(`accessibility.violations.${sanitizedUrl}.${severity} ${bySeverity[severity]} ${timestamp}`);
+      metrics.push({
+        name: `accessibility.violations.${sanitizedUrl}.${severity}`,
+        value: bySeverity[severity],
+        time: timestamp
+      });
     });
     
-    metrics.push(`accessibility.passes.${sanitizedUrl} ${results.passes.length} ${timestamp}`);
-    metrics.push(`accessibility.incomplete.${sanitizedUrl} ${results.incomplete.length} ${timestamp}`);
+    metrics.push({
+      name: `accessibility.passes.${sanitizedUrl}`,
+      value: results.passes.length,
+      time: timestamp
+    });
     
-    // Total violations
-    const totalViolations = results.violations.length;
-    metrics.push(`accessibility.total_violations.${sanitizedUrl} ${totalViolations} ${timestamp}`);
+    metrics.push({
+      name: `accessibility.incomplete.${sanitizedUrl}`,
+      value: results.incomplete.length,
+      time: timestamp
+    });
+    
+    metrics.push({
+      name: `accessibility.total_violations.${sanitizedUrl}`,
+      value: results.violations.length,
+      time: timestamp
+    });
   });
   
-  return metrics.join('\n');
+  return metrics;
 }
 
 // Push to Graphite
-async function pushToGraphite(metricsText) {
+async function pushToGraphite(metrics) {
   if (!GRAPHITE_URL || !GRAPHITE_USER || !GRAPHITE_PASSWORD) {
     throw new Error('Missing Graphite credentials');
   }
@@ -82,10 +97,10 @@ async function pushToGraphite(metricsText) {
     const response = await fetch(GRAPHITE_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'text/plain',
+        'Content-Type': 'application/json',
         'Authorization': `Basic ${auth}`
       },
-      body: metricsText
+      body: JSON.stringify(metrics)
     });
     
     if (response.ok || response.status === 204 || response.status === 200) {
@@ -119,12 +134,12 @@ async function main() {
   }
   
   if (allResults.length > 0) {
-    const metricsText = formatForGraphite(allResults);
+    const metrics = formatForGraphite(allResults);
     console.log('\nMetrics to send:');
-    console.log(metricsText);
+    console.log(JSON.stringify(metrics, null, 2));
     console.log('');
     
-    await pushToGraphite(metricsText);
+    await pushToGraphite(metrics);
   }
   
   console.log('Scan complete!');
