@@ -1,27 +1,8 @@
 ---
 ---
 
-// Override Minima's link colors BEFORE importing
-$brand-color: #0050BA;
-$link-base-color: #0050BA;
-$link-visited-color: #0050BA;
-
 @import "minima";
 
-// Additional specific overrides with higher specificity
-a {
-  color: #0050BA !important;
-}
-
-a:visited {
-  color: #0050BA !important;
-}
-
-a:hover {
-  color: #0050BA !important;
-}
-
-// Keep your existing underline styles
 .post-content a,
 .page-content a,
 article a,
