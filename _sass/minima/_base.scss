@@ -1,0 +1,20 @@
+// Find and override link colors
+a {
+  color: #0050BA;
+  text-decoration: none;
+
+  &:visited {
+    color: #1756a9;
+  }
+
+  &:hover {
+    color: #111;
+    text-decoration: underline;
+  }
+}
+
+// Post meta and page name colors
+.post-meta,
+.p-name {
+  color: #575757 !important;
+}
