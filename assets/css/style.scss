@@ -1,8 +1,5 @@
 ---
 ---
-$link-base-color: #0050BA;
-$link-visited-color: #1A5490;
-$link-hover-color: #1A5490;
 
 @import "minima";
 
@@ -11,6 +8,7 @@ $link-hover-color: #1A5490;
 article a,
 .home a,
 p a {
+  color: #0050BA !important;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -18,6 +16,6 @@ p a {
 .site-nav a,
 .site-header a,
 .site-footer a {
-  color: #0050BA;
+  color: #0050BA !important;
   text-decoration: none;
 }
